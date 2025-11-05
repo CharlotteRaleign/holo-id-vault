@@ -356,6 +356,41 @@ contract HoloIdVault is SepoliaConfig {
         emit BatchAttributesUpdated(msg.sender, attributeNames.length, isSharedStatuses[0]);
     }
 
+    /// @notice Update sharing status for multiple attributes in batch
+    /// @param attributeNames Array of attribute names to update
+    /// @param isSharedStatuses Array of new sharing statuses corresponding to attribute names
+    function updateAttributesSharingBatch(
+        string[] calldata attributeNames,
+        bool[] calldata isSharedStatuses
+    ) external onlyProfileOwner {
+        require(attributeNames.length == isSharedStatuses.length, "Array lengths must match");
+        require(attributeNames.length > 0 && attributeNames.length <= 10, "Batch size must be between 1 and 10");
+
+        uint256 attributesLength = _profiles[msg.sender].attributes.length;
+
+        for (uint256 i = 0; i < attributeNames.length; i++) {
+            string calldata attributeName = attributeNames[i];
+            bool isShared = isSharedStatuses[i];
+
+            bool found = false;
+            for (uint256 j = 0; j < attributesLength; ) {
+                if (keccak256(bytes(_profiles[msg.sender].attributes[j].name)) ==
+                    keccak256(bytes(attributeName))) {
+                    _profiles[msg.sender].attributes[j].isShared = isShared;
+                    emit AttributeUpdated(msg.sender, attributeName, isShared);
+                    found = true;
+                    break;
+                }
+                unchecked { ++j; }
+            }
+            require(found, "Attribute not found");
+        }
+
+        _profiles[msg.sender].updatedAt = uint64(block.timestamp);
+        emit ProfileUpdated(msg.sender, uint64(block.timestamp));
+        emit BatchAttributesUpdated(msg.sender, attributeNames.length, isSharedStatuses[0]);
+    }
+
     /// @notice Get multiple attribute info in a single call to reduce gas costs
     /// @param owner The address of the profile owner
     /// @param startIndex The starting index
