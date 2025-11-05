@@ -47,6 +47,8 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
   const [batchUpdating, setBatchUpdating] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   // Check if profile exists
   const { data: hasProfile } = useReadContract({
