@@ -226,6 +226,36 @@ contract HoloIdVault is SepoliaConfig {
         return _hasProfile[owner];
     }
 
+    /// @notice Get comprehensive profile statistics in a single call
+    /// @param owner The address of the profile owner
+    /// @return exists Whether profile exists
+    /// @return attributeCount Number of attributes
+    /// @return createdAt Profile creation timestamp
+    /// @return updatedAt Profile last update timestamp
+    function getProfileStats(address owner)
+        external
+        view
+        returns (
+            bool exists,
+            uint256 attributeCount,
+            uint64 createdAt,
+            uint64 updatedAt
+        )
+    {
+        bool profileExists = _hasProfile[owner];
+        if (!profileExists) {
+            return (false, 0, 0, 0);
+        }
+
+        DIDProfile storage profile = _profiles[owner];
+        return (
+            true,
+            profile.attributes.length,
+            profile.createdAt,
+            profile.updatedAt
+        );
+    }
+
     /// @notice Get contract version and metadata
     /// @return version Contract version
     /// @return name Contract name
