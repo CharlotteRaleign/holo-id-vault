@@ -15,6 +15,10 @@ describe("EncryptedNotesSepolia", function () {
   let step: number;
   let steps: number;
 
+  // Test data
+  const testNote = "This is a test encrypted note for Sepolia network";
+  const testTitle = "Test Note Title";
+
   function progress(message: string) {
     console.log(`${++step}/${steps} ${message}`);
   }
@@ -92,6 +96,36 @@ describe("EncryptedNotesSepolia", function () {
     progress(`Decrypted content value=${decryptedContent}`);
 
     expect(decryptedContent).to.eq(contentValue);
+  });
+
+  it("Should handle multiple encrypted notes correctly", async function () {
+    progress("Testing multiple encrypted notes");
+
+    // Create multiple notes
+    const notes = [
+      { title: "Note 1", content: "First encrypted note content" },
+      { title: "Note 2", content: "Second encrypted note content" },
+      { title: "Note 3", content: "Third encrypted note content" }
+    ];
+
+    for (const note of notes) {
+      const encryptedTitle = await fhevm.encrypt64(BigInt(ethers.encodeBytes32String(note.title)));
+      const encryptedContent = await fhevm.encrypt64(BigInt(ethers.encodeBytes32String(note.content)));
+
+      const tx = await encryptedNotesContract.connect(signers.alice).createNote(
+        encryptedTitle.handles[0],
+        encryptedContent.handles[0],
+        encryptedTitle.inputProof,
+        encryptedContent.inputProof
+      );
+      await tx.wait();
+    }
+
+    // Check total notes count
+    const totalNotes = await encryptedNotesContract.getTotalNotes();
+    expect(Number(totalNotes)).to.be.greaterThanOrEqual(notes.length);
+
+    progress(`Successfully created ${notes.length} encrypted notes`);
   });
 });
 
