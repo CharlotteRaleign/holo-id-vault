@@ -56,6 +56,8 @@ contract HoloIdVault is SepoliaConfig {
     event AttributeRemoved(address indexed owner, string attributeName);
     event BatchAttributesUpdated(address indexed owner, uint256 count, bool isShared);
     event AttributeDecrypted(address indexed owner, string attributeName, address indexed decryptor);
+    event ContractEmergencyStop(address indexed caller, uint64 timestamp);
+    event ContractResumed(address indexed caller, uint64 timestamp);
 
     /// @notice Set or update an attribute in the DID profile
     /// @param attributeName The name of the attribute (e.g., "Email", "Age")
