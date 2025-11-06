@@ -309,6 +309,33 @@ contract HoloIdVault is SepoliaConfig {
         return (false, 0, false);
     }
 
+    /// @notice Check if a specific attribute exists for a profile
+    /// @param owner The address of the profile owner
+    /// @param attributeName The name of the attribute to check
+    /// @return exists Whether the attribute exists
+    /// @return index The index of the attribute (if exists)
+    /// @return isShared Whether the attribute is shared (if exists)
+    function attributeExists(address owner, string calldata attributeName)
+        external
+        view
+        returns (bool exists, uint256 index, bool isShared)
+    {
+        if (!_hasProfile[owner]) {
+            return (false, 0, false);
+        }
+
+        uint256 attributesLength = _profiles[owner].attributes.length;
+        for (uint256 i = 0; i < attributesLength; ) {
+            if (keccak256(bytes(_profiles[owner].attributes[i].name)) ==
+                keccak256(bytes(attributeName))) {
+                return (true, i, _profiles[owner].attributes[i].isShared);
+            }
+            unchecked { ++i; }
+        }
+
+        return (false, 0, false);
+    }
+
     /// @notice Get total number of profiles created (utility function)
     /// @return count Total number of profiles
     function getTotalProfiles() external view returns (uint256 count) {
