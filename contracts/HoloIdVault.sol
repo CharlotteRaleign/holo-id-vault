@@ -343,6 +343,51 @@ contract HoloIdVault is SepoliaConfig {
         return results;
     }
 
+    /// @notice Get profile statistics for multiple addresses (batch operation)
+    /// @param owners Array of addresses to check
+    /// @return existsResults Array of existence flags
+    /// @return countResults Array of attribute counts
+    /// @return createdResults Array of creation timestamps
+    /// @return updatedResults Array of update timestamps
+    function getProfilesBatch(address[] calldata owners)
+        external
+        view
+        returns (
+            bool[] memory existsResults,
+            uint256[] memory countResults,
+            uint64[] memory createdResults,
+            uint64[] memory updatedResults
+        )
+    {
+        require(owners.length > 0 && owners.length <= 20, "Batch size must be between 1 and 20");
+
+        existsResults = new bool[](owners.length);
+        countResults = new uint256[](owners.length);
+        createdResults = new uint64[](owners.length);
+        updatedResults = new uint64[](owners.length);
+
+        for (uint256 i = 0; i < owners.length; ) {
+            address owner = owners[i];
+            bool exists = _hasProfile[owner];
+            existsResults[i] = exists;
+
+            if (exists) {
+                DIDProfile storage profile = _profiles[owner];
+                countResults[i] = profile.attributes.length;
+                createdResults[i] = profile.createdAt;
+                updatedResults[i] = profile.updatedAt;
+            } else {
+                countResults[i] = 0;
+                createdResults[i] = 0;
+                updatedResults[i] = 0;
+            }
+
+            unchecked { ++i; }
+        }
+
+        return (existsResults, countResults, createdResults, updatedResults);
+    }
+
     /// @notice Check if a specific attribute exists for a profile
     /// @param owner The address of the profile owner
     /// @param attributeName The name of the attribute to check
