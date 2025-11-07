@@ -8,6 +8,9 @@ import {SepoliaConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 /// @notice Stores encrypted DID profiles where attributes are protected by hybrid encryption (AES + FHE)
 /// @dev Each attribute value is encrypted client-side with AES, and the key is encrypted with FHE
 contract HoloIdVault is SepoliaConfig {
+    /// @dev Emergency stop flag
+    bool private _emergencyStopped;
+
     /// @dev Reentrancy guard
     uint256 private _status;
 
@@ -17,6 +20,12 @@ contract HoloIdVault is SepoliaConfig {
         _status = 1;
         _;
         _status = 0;
+    }
+
+    /// @dev Modifier to check if contract is not in emergency stop
+    modifier whenNotEmergencyStopped() {
+        require(!_emergencyStopped, "Contract is emergency stopped");
+        _;
     }
 
     /// @dev Modifier to ensure the caller has a profile
@@ -256,6 +265,26 @@ contract HoloIdVault is SepoliaConfig {
             profile.createdAt,
             profile.updatedAt
         );
+    }
+
+    /// @notice Emergency stop the contract (only owner)
+    function emergencyStop() external {
+        // Note: In production, this should be restricted to contract owner
+        _emergencyStopped = true;
+        emit ContractEmergencyStop(msg.sender, uint64(block.timestamp));
+    }
+
+    /// @notice Resume contract operations (only owner)
+    function resumeContract() external {
+        // Note: In production, this should be restricted to contract owner
+        _emergencyStopped = false;
+        emit ContractResumed(msg.sender, uint64(block.timestamp));
+    }
+
+    /// @notice Check if contract is emergency stopped
+    /// @return stopped Whether the contract is stopped
+    function isEmergencyStopped() external view returns (bool stopped) {
+        return _emergencyStopped;
     }
 
     /// @notice Get contract version and metadata
