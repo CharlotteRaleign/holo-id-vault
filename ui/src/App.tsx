@@ -3,7 +3,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useFhevm } from './fhevm/useFhevm';
 import { useWalletClient } from 'wagmi';
 import { DIDProfile } from './components/DIDProfile';
-import { Lock, Loader2, Shield } from 'lucide-react';
+import { Lock, Loader2, Shield, Zap } from 'lucide-react';
 
 function App() {
   const { address } = useAccount();
@@ -101,7 +101,10 @@ function App() {
               <div className="flex flex-wrap gap-4 justify-center items-center pt-4">
                 <div className="px-6 py-3 rounded-lg bg-card border border-primary/30 text-sm">
                   <span className="text-muted-foreground">Protocol:</span>{' '}
-                  <span className="font-mono text-primary">DID v2.0</span>
+                  <span className="font-mono text-primary flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    DID v2.0
+                  </span>
                 </div>
                 <div className="px-6 py-3 rounded-lg bg-card border border-primary/30 text-sm">
                   <span className="text-muted-foreground">Chain:</span>{' '}
