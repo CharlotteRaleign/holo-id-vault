@@ -494,6 +494,12 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
             >
               Clear Selection
             </Button>
+            {batchUpdating && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Updating...
+              </div>
+            )}
           </div>
         )}
 
