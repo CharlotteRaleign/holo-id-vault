@@ -80,7 +80,7 @@ contract HoloIdVault is SepoliaConfig {
         externalEuint256 keyExternal,
         bytes calldata inputProof,
         bool isShared
-    ) external nonReentrant {
+    ) external nonReentrant whenNotEmergencyStopped {
         euint256 keyEnc = FHE.fromExternal(keyExternal, inputProof);
         
         // Set ACL permissions for the encrypted key
@@ -132,7 +132,7 @@ contract HoloIdVault is SepoliaConfig {
 
     /// @notice Remove an attribute from the profile
     /// @param attributeName The name of the attribute to remove
-    function removeAttribute(string calldata attributeName) external onlyProfileOwner validAttributeName(attributeName) nonReentrant {
+    function removeAttribute(string calldata attributeName) external onlyProfileOwner validAttributeName(attributeName) nonReentrant whenNotEmergencyStopped {
         uint256 length = _profiles[msg.sender].attributes.length;
         for (uint256 i = 0; i < length; ) {
             if (keccak256(bytes(_profiles[msg.sender].attributes[i].name)) ==
