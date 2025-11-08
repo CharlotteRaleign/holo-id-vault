@@ -108,7 +108,10 @@ function App() {
                 </div>
                 <div className="px-6 py-3 rounded-lg bg-card border border-primary/30 text-sm">
                   <span className="text-muted-foreground">Chain:</span>{' '}
-                  <span className="font-mono text-primary">Ethereum</span>
+                  <span className="font-mono text-primary flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    Ethereum Sepolia
+                  </span>
                 </div>
                 <div className="px-6 py-3 rounded-lg bg-card border border-primary/30 text-sm">
                   <span className="text-muted-foreground">Encryption:</span>{' '}
