@@ -512,7 +512,15 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
         {lastError && (
           <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-sm" role="alert" aria-live="assertive">
             <div className="font-semibold text-destructive mb-1">Last Error:</div>
-            <div className="text-destructive/80 text-xs break-all">{lastError}</div>
+            <div className="text-destructive/80 text-xs break-all mb-2">{lastError}</div>
+            <Button
+              onClick={() => saveProfile(false)}
+              variant="outline"
+              size="sm"
+              className="text-xs border-destructive/50 hover:bg-destructive/10"
+            >
+              Retry Operation
+            </Button>
           </div>
         )}
 
