@@ -287,7 +287,26 @@ contract HoloIdVault is SepoliaConfig {
         return _emergencyStopped;
     }
 
-    /// @notice Get contract version and metadata
+    /// @notice Get contract version and comprehensive metadata
+    /// @return version Contract version
+    /// @return name Contract name
+    /// @return description Contract description
+    /// @return deployedAt Deployment timestamp
+    function getContractMetadata() external view returns (
+        string memory version,
+        string memory name,
+        string memory description,
+        uint64 deployedAt
+    ) {
+        return (
+            "1.0.0",
+            "HoloIdVault",
+            "Decentralized Identity Vault with Fully Homomorphic Encryption",
+            uint64(block.timestamp) // This would be set at deployment in production
+        );
+    }
+
+    /// @notice Get contract version and metadata (legacy function)
     /// @return version Contract version
     /// @return name Contract name
     function getContractInfo() external pure returns (string memory version, string memory name) {
