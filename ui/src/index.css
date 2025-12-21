@@ -38,6 +38,8 @@
     --gradient-hologram: linear-gradient(135deg, hsl(195 100% 50%), hsl(280 70% 55%), hsl(195 100% 70%));
     --gradient-cyber: linear-gradient(180deg, hsl(220 30% 8%), hsl(220 25% 12%));
     --gradient-glow: radial-gradient(circle, hsl(195 100% 50% / 0.2), transparent);
+    --gradient-glow-purple: radial-gradient(circle, hsl(280 70% 55% / 0.15), transparent);
+    --gradient-glow-cyan: radial-gradient(circle, hsl(195 100% 60% / 0.2), transparent);
     
     /* Shadows and effects */
     --shadow-neon: 0 0 20px hsl(195 100% 50% / 0.5), 0 0 40px hsl(195 100% 50% / 0.3);
@@ -60,18 +62,190 @@
       sans-serif;
   }
   
-  /* Futuristic grid background */
+  /* Enhanced grid background with perspective */
   .grid-bg {
     background-image:
-      linear-gradient(hsl(195 100% 50% / 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(195 100% 50% / 0.1) 1px, transparent 1px);
+      linear-gradient(hsl(195 100% 50% / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(195 100% 50% / 0.15) 1px, transparent 1px);
     background-size: clamp(30px, 8vw, 50px) clamp(30px, 8vw, 50px);
     animation: grid-pulse 4s ease-in-out infinite;
+    position: relative;
+  }
+  
+  /* 3D perspective grid effect */
+  .grid-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(hsl(280 70% 55% / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(280 70% 55% / 0.08) 1px, transparent 1px);
+    background-size: clamp(60px, 16vw, 100px) clamp(60px, 16vw, 100px);
+    transform: perspective(1000px) rotateX(60deg) translateY(-20%);
+    transform-origin: center;
+    animation: grid-3d 20s linear infinite;
   }
   
   @keyframes grid-pulse {
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.6; }
+  }
+  
+  @keyframes grid-3d {
+    0% { transform: perspective(1000px) rotateX(60deg) translateY(-20%) translateZ(0); }
+    100% { transform: perspective(1000px) rotateX(60deg) translateY(-20%) translateZ(200px); }
+  }
+  
+  /* Animated gradient orbs */
+  .gradient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: orb-float 20s ease-in-out infinite;
+    opacity: 0.4;
+  }
+  
+  .gradient-orb-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, hsl(195 100% 50% / 0.4), hsl(195 100% 50% / 0));
+    top: -200px;
+    left: -200px;
+    animation-delay: 0s;
+  }
+  
+  .gradient-orb-2 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, hsl(280 70% 55% / 0.3), hsl(280 70% 55% / 0));
+    bottom: -300px;
+    right: -300px;
+    animation-delay: -5s;
+  }
+  
+  .gradient-orb-3 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, hsl(195 100% 60% / 0.35), hsl(195 100% 60% / 0));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -10s;
+  }
+  
+  @keyframes orb-float {
+    0%, 100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(50px, -50px) scale(1.1);
+    }
+    50% {
+      transform: translate(-30px, 30px) scale(0.9);
+    }
+    75% {
+      transform: translate(30px, 50px) scale(1.05);
+    }
+  }
+  
+  /* Floating particles */
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: hsl(195 100% 50%);
+    border-radius: 50%;
+    box-shadow: 0 0 6px hsl(195 100% 50%);
+    animation: particle-float 15s linear infinite;
+    opacity: 0.6;
+  }
+  
+  @keyframes particle-float {
+    0% {
+      transform: translateY(100vh) translateX(0) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.6;
+    }
+    90% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-100px) translateX(100px) scale(1);
+      opacity: 0;
+    }
+  }
+  
+  /* Animated light rays */
+  .light-rays {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .light-ray {
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      hsl(195 100% 50% / 0.1),
+      transparent
+    );
+    animation: ray-sweep 8s linear infinite;
+  }
+  
+  @keyframes ray-sweep {
+    0% {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(calc(100vw + 100px));
+      opacity: 0;
+    }
+  }
+  
+  /* Data stream effect */
+  .data-stream {
+    position: absolute;
+    width: 2px;
+    height: 200px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      hsl(195 100% 50% / 0.8),
+      transparent
+    );
+    animation: stream-flow 3s linear infinite;
+    opacity: 0.4;
+  }
+  
+  @keyframes stream-flow {
+    0% {
+      transform: translateY(-200px);
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
   }
   
   /* Hologram effect */
@@ -130,5 +304,33 @@
   /* Shadow cyber */
   .shadow-cyber {
     box-shadow: var(--shadow-cyber);
+  }
+  
+  /* Glitch effect for extra cyberpunk feel */
+  .glitch-bg {
+    position: relative;
+  }
+  
+  .glitch-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(195 100% 50% / 0.03) 50%,
+      transparent 100%
+    );
+    animation: glitch-scan 10s linear infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes glitch-scan {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
   }
 }

@@ -313,36 +313,6 @@ contract HoloIdVault is SepoliaConfig {
         return ("1.0.0", "HoloIdVault");
     }
 
-    /// @notice Get comprehensive profile statistics in a single call
-    /// @param owner The address of the profile owner
-    /// @return exists Whether profile exists
-    /// @return attributeCount Number of attributes
-    /// @return createdAt Profile creation timestamp
-    /// @return updatedAt Profile last update timestamp
-    function getProfileStats(address owner)
-        external
-        view
-        returns (
-            bool exists,
-            uint256 attributeCount,
-            uint64 createdAt,
-            uint64 updatedAt
-        )
-    {
-        bool profileExists = _hasProfile[owner];
-        if (!profileExists) {
-            return (false, 0, 0, 0);
-        }
-
-        DIDProfile storage profile = _profiles[owner];
-        return (
-            true,
-            profile.attributes.length,
-            profile.createdAt,
-            profile.updatedAt
-        );
-    }
-
     /// @notice Check if multiple addresses have profiles (batch operation)
     /// @param owners Array of addresses to check
     /// @return results Array of boolean results corresponding to owners
@@ -434,33 +404,6 @@ contract HoloIdVault is SepoliaConfig {
         return (false, 0, false);
     }
 
-    /// @notice Check if a specific attribute exists for a profile
-    /// @param owner The address of the profile owner
-    /// @param attributeName The name of the attribute to check
-    /// @return exists Whether the attribute exists
-    /// @return index The index of the attribute (if exists)
-    /// @return isShared Whether the attribute is shared (if exists)
-    function attributeExists(address owner, string calldata attributeName)
-        external
-        view
-        returns (bool exists, uint256 index, bool isShared)
-    {
-        if (!_hasProfile[owner]) {
-            return (false, 0, false);
-        }
-
-        uint256 attributesLength = _profiles[owner].attributes.length;
-        for (uint256 i = 0; i < attributesLength; ) {
-            if (keccak256(bytes(_profiles[owner].attributes[i].name)) ==
-                keccak256(bytes(attributeName))) {
-                return (true, i, _profiles[owner].attributes[i].isShared);
-            }
-            unchecked { ++i; }
-        }
-
-        return (false, 0, false);
-    }
-
     /// @notice Get total number of profiles created (utility function)
     /// @return count Total number of profiles
     function getTotalProfiles() external view returns (uint256 count) {
@@ -488,41 +431,6 @@ contract HoloIdVault is SepoliaConfig {
 
             require(bytes(attributeName).length > 0, "Attribute name cannot be empty");
             require(bytes(attributeName).length <= 32, "Attribute name too long");
-
-            bool found = false;
-            for (uint256 j = 0; j < attributesLength; ) {
-                if (keccak256(bytes(_profiles[msg.sender].attributes[j].name)) ==
-                    keccak256(bytes(attributeName))) {
-                    _profiles[msg.sender].attributes[j].isShared = isShared;
-                    emit AttributeUpdated(msg.sender, attributeName, isShared);
-                    found = true;
-                    break;
-                }
-                unchecked { ++j; }
-            }
-            require(found, "Attribute not found");
-        }
-
-        _profiles[msg.sender].updatedAt = uint64(block.timestamp);
-        emit ProfileUpdated(msg.sender, uint64(block.timestamp));
-        emit BatchAttributesUpdated(msg.sender, attributeNames.length, isSharedStatuses[0]);
-    }
-
-    /// @notice Update sharing status for multiple attributes in batch
-    /// @param attributeNames Array of attribute names to update
-    /// @param isSharedStatuses Array of new sharing statuses corresponding to attribute names
-    function updateAttributesSharingBatch(
-        string[] calldata attributeNames,
-        bool[] calldata isSharedStatuses
-    ) external onlyProfileOwner {
-        require(attributeNames.length == isSharedStatuses.length, "Array lengths must match");
-        require(attributeNames.length > 0 && attributeNames.length <= 10, "Batch size must be between 1 and 10");
-
-        uint256 attributesLength = _profiles[msg.sender].attributes.length;
-
-        for (uint256 i = 0; i < attributeNames.length; i++) {
-            string calldata attributeName = attributeNames[i];
-            bool isShared = isSharedStatuses[i];
 
             bool found = false;
             for (uint256 j = 0; j < attributesLength; ) {

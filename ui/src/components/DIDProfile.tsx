@@ -12,7 +12,7 @@ import { useContractAddress } from '../hooks/useContractAddress';
 import { CONTRACT_ABI } from '../config/contracts';
 import type { FhevmInstance } from '../fhevm/fhevmTypes';
 import { encryptStringWithKey, decryptStringWithKey } from '../utils/crypto';
-import { Loader2, CheckSquare, Square } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface Attribute {
   name: string;
@@ -42,11 +42,6 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [decryptingIndex, setDecryptingIndex] = useState<number | null>(null);
   const [togglingIndex, setTogglingIndex] = useState<number | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [selectedAttributes, setSelectedAttributes] = useState<Set<number>>(new Set());
-  const [batchUpdating, setBatchUpdating] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const [lastError, setLastError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [lastError, setLastError] = useState<string | null>(null);
 
@@ -380,60 +375,6 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
     }
   };
 
-  const batchUpdateSharing = async (newShared: boolean) => {
-    if (!address || !contractAddress || !hasProfile || selectedAttributes.size === 0) {
-      toast.error('Missing wallet, profile, or no attributes selected');
-      return;
-    }
-
-    setBatchUpdating(true);
-    try {
-      const signer = await signerPromise;
-      if (!signer) throw new Error('No signer available');
-
-      const contract = new Contract(contractAddress, CONTRACT_ABI, signer);
-
-      const attributeNames = Array.from(selectedAttributes).map(index => attributes[index].name);
-      const isSharedStatuses = Array.from(selectedAttributes).map(() => newShared);
-
-      const tx = await contract.updateAttributesSharingBatch(attributeNames, isSharedStatuses);
-      await tx.wait();
-
-      // Update local state
-      setAttributes(prev =>
-        prev.map((attr, index) =>
-          selectedAttributes.has(index) ? { ...attr, isShared: newShared } : attr
-        )
-      );
-
-      setSelectedAttributes(new Set());
-      toast.success(`${selectedAttributes.size} attributes ${newShared ? 'shared' : 'made private'}`);
-    } catch (err: any) {
-      console.error('Failed to batch update sharing:', err);
-      toast.error('Failed to batch update sharing: ' + (err?.message || 'Unknown error'));
-    } finally {
-      setBatchUpdating(false);
-    }
-  };
-
-  const toggleAttributeSelection = useCallback((index: number) => {
-    setSelectedAttributes(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(index)) {
-        newSet.delete(index);
-      } else {
-        newSet.add(index);
-      }
-      return newSet;
-    });
-  }, []);
-
-  const handleKeyDown = useCallback((event: React.KeyboardEvent, action: () => void) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      action();
-    }
-  }, []);
 
   if (!address) {
     return (
@@ -461,47 +402,6 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
           </p>
         </div>
 
-        {hasProfile && (
-          <div className="flex flex-wrap gap-2 p-3 rounded-lg bg-muted/50 border border-border" role="region" aria-label="Batch operations">
-            <div className="text-sm text-muted-foreground mr-2">Batch operations:</div>
-            <Button
-              onClick={() => batchUpdateSharing(true)}
-              disabled={batchUpdating || selectedAttributes.size === 0}
-              variant="outline"
-              size="sm"
-              className="text-xs"
-              aria-label={`Share ${selectedAttributes.size} selected attributes`}
-            >
-              Share Selected ({selectedAttributes.size})
-            </Button>
-            <Button
-              onClick={() => batchUpdateSharing(false)}
-              disabled={batchUpdating || selectedAttributes.size === 0}
-              variant="outline"
-              size="sm"
-              className="text-xs"
-              aria-label={`Make ${selectedAttributes.size} selected attributes private`}
-            >
-              Make Private ({selectedAttributes.size})
-            </Button>
-            <Button
-              onClick={() => setSelectedAttributes(new Set())}
-              disabled={selectedAttributes.size === 0}
-              variant="ghost"
-              size="sm"
-              className="text-xs"
-              aria-label="Clear all attribute selections"
-            >
-              Clear Selection
-            </Button>
-            {batchUpdating && (
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Updating...
-              </div>
-            )}
-          </div>
-        )}
 
         {isLoading && (
           <div className="text-center text-sm text-muted-foreground py-4">
@@ -531,21 +431,6 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
               className="p-4 rounded-lg bg-background border border-border hover:border-primary transition-all"
             >
               <div className="flex items-start justify-between gap-4">
-                {hasProfile && (
-                  <button
-                    onClick={() => toggleAttributeSelection(index)}
-                    onKeyDown={(e) => handleKeyDown(e, () => toggleAttributeSelection(index))}
-                    className="mt-1 p-1 rounded hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-                    aria-label={`Select ${attr.name} for batch operations`}
-                    tabIndex={0}
-                  >
-                    {selectedAttributes.has(index) ? (
-                      <CheckSquare className="w-4 h-4 text-primary" />
-                    ) : (
-                      <Square className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </button>
-                )}
                 <div className="flex-1 space-y-2">
                   <Label htmlFor={`attr-${index}`} className="text-foreground">
                     {attr.name}
