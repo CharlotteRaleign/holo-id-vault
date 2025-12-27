@@ -6,9 +6,8 @@ A decentralized identity (DID) profile management system with selective attribut
 
 Watch the demo video to see HoloIdVault in action:
 
-[![Demo Video](encrypted-notes.mp4)](encrypted-notes.mp4)
+[![Demo Video]](https://youtu.be/B71NGejVO1I)
 
-Or view directly: [encrypted-notes.mp4](./encrypted-notes.mp4)
 
 ## 🌐 Live Demo
 

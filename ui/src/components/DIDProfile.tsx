@@ -460,11 +460,10 @@ function DIDProfileComponent({ instance }: DIDProfileProps) {
                       </div>
                       <Button
                         onClick={() => decryptAttribute(index)}
-                        disabled={decryptingIndex === index || (!attr.value || attr.value === '')}
+                        disabled={decryptingIndex === index || (!attr.value || attr.value === '') || !attr.isShared}
                         variant="outline"
                         size="sm"
                         className="w-full"
-                        disabled={decryptingIndex === index || (!attr.value || attr.value === '')}
                       >
                         {decryptingIndex === index ? 'Decrypting...' : 'Decrypt & View'}
                       </Button>
